@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import Input from "./Input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const initialState = {
   name: "",
@@ -14,8 +16,6 @@ const initialState = {
 const SignupForm = () => {
   const [hydrated, setHydrated] = useState(false);
   const [state, setState] = useState(initialState);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
@@ -30,36 +30,43 @@ const SignupForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const { name, email, password } = state;
-
+  
+    // Kiểm tra nếu tất cả các trường đều trống
     if (!name || !email || !password) {
-      setError("All fields are required");
+      toast.error("All fields are required", { autoClose: 2000 });
       return;
     }
-
-    // Regular expression pattern for a basic email validation
+  
+    // Regular expression pattern for basic email validation
     const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-
+  
+    
+    let hasError = false;
+  
     if (!pattern.test(email)) {
-      setError("Please enter a valid email address.");
-      return;
+      toast.error("Please enter a valid email address.", { autoClose: 2000 });
+      hasError = true; 
     }
-
+  
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
-      return;
+      toast.error("Password must be at least 6 characters long.", { autoClose: 2000 });
+      hasError = true; 
     }
+  
 
+    if (hasError) return;
+  
     try {
       setIsLoading(true);
-
+  
       const newUser = {
         name,
         email,
         password,
       };
-
+  
       const response = await fetch("http://localhost:3000/api/signup", {
         headers: {
           "Content-Type": "application/json",
@@ -67,24 +74,25 @@ const SignupForm = () => {
         method: "POST",
         body: JSON.stringify(newUser),
       });
-
+  
       if (response?.status === 201) {
-        setSuccess("Registration Successful");
+        toast.success("Registration Successful", { autoClose: 2000 });
         setTimeout(() => {
           router.push("/login", { scroll: false });
-        }, 1000);
+        }, 2000);
       } else {
-        setError("Error occured while registering");
+        toast.error("Error occurred while registering", { autoClose: 2000 });
       }
     } catch (error) {
       console.log(error);
+      toast.error("An unexpected error occurred", { autoClose: 2000 });
     }
-
+  
     setIsLoading(false);
   };
+  
 
   const handleChange = (event) => {
-    setError("");
     setState({ ...state, [event.target.name]: event.target.value });
   };
 
@@ -118,10 +126,6 @@ const SignupForm = () => {
           value={state.password}
         />
 
-        {error && <div className="text-red-700">{error}</div>}
-
-        {success && <div className="text-green-700">{success}</div>}
-
         <button type="submit" className="btn w-full">
           {isLoading ? "Loading..." : "Sign Up"}
         </button>
@@ -133,6 +137,9 @@ const SignupForm = () => {
           </Link>
         </p>
       </form>
+
+      {/* Toast container to display notifications */}
+      <ToastContainer />
     </section>
   );
 };

@@ -5,8 +5,10 @@ import Image from 'next/image'
 import gigachad from '@/public/img/gigachad.jpg'
 import {AiOutlineClose} from 'react-icons/ai'
 import { usePathname } from 'next/navigation'
+import {signOut, useSession} from'next-auth/react'
 
 const Navbar = () => {
+    const {data: session, status} = useSession();
     const pathname = usePathname();
     const [showDropdown, setShowDropdown] = useState(false)
     const loggedIn = false;
@@ -25,7 +27,7 @@ const Navbar = () => {
             </li>
 
             {
-                loggedIn ? (
+                session?.user ? (
                     <>
                         <li>
                             <Link href="/create-blog" className={pathname === '/create-blog' ? "text-primaryColor font-bold" : ""}>Create Blog</Link>
@@ -42,7 +44,7 @@ const Navbar = () => {
                                 {showDropdown && (
                                     <div className = 'absolute top-0 right-0 bg-primaryColorLight p-5'>
                                         <AiOutlineClose onClick = {handleHideDropdown} className = 'w-full cursor-pointer' />
-                                        <button onClick = {handleHideDropdown}>Logout</button>
+                                        <button onClick = {() => {signOut();handleHideDropdown();}}>Logout</button>
                                         <Link onClick = {handleHideDropdown} href="/user">User</Link>
                                     </div>
                                 )

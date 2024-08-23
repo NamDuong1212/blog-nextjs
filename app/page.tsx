@@ -1,6 +1,7 @@
 'use client'
 import Image from "next/image";
 import gigachad from '@/public/img/gigachad.jpg';
+import VJU from '@/public/img/VJU.png'
 import BlogItem from "./blogitem/page"; 
 import BlogList from "./bloglist/page";
 
@@ -21,8 +22,8 @@ export default function Home() {
         </div>
         <div className="md:block basis-1/3">
           <Image 
-            src={gigachad}
-            alt="Gigachad"
+            src={VJU}
+            alt="VJU"
             sizes="100vw"
             className="w-full h-auto rounded-lg"
           />
